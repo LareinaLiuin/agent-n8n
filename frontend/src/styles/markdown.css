@@ -1,0 +1,157 @@
+/* Markdown样式 */
+.markdown-content {
+  line-height: 1.6;
+  color: #374151;
+  word-wrap: break-word;
+}
+
+.markdown-content .markdown-h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1.5em 0 1em 0;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5em;
+}
+
+.markdown-content .markdown-h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 1.2em 0 0.8em 0;
+  color: #374151;
+}
+
+.markdown-content .markdown-h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 1em 0 0.6em 0;
+  color: #4b5563;
+}
+
+.markdown-content .markdown-h4 {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 0.8em 0 0.5em 0;
+  color: #6b7280;
+}
+
+.markdown-content .markdown-h5 {
+  font-size: 1.05em;
+  font-weight: bold;
+  margin: 0.8em 0 0.4em 0;
+  color: #6b7280;
+}
+
+.markdown-content .markdown-h6 {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0.6em 0 0.3em 0;
+  color: #6b7280;
+}
+
+.markdown-content .markdown-p {
+  margin: 0.8em 0;
+  line-height: 1.6;
+}
+
+.markdown-content .markdown-list {
+  margin: 0.8em 0;
+  padding-left: 2em;
+}
+
+.markdown-content .markdown-list li {
+  margin: 0.4em 0;
+  line-height: 1.6;
+  list-style-type: disc;
+}
+
+.markdown-content .markdown-list li::marker {
+  color: #3b82f6;
+}
+
+.markdown-content code {
+  background-color: #f3f4f6;
+  color: #d1d5db;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.markdown-content .code-block {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 1.5em;
+  border-radius: 8px;
+  margin: 1.5em 0;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  position: relative;
+}
+
+.markdown-content .code-block .code-language {
+  color: #9ca3af;
+  font-size: 0.85em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+}
+
+.markdown-content .code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  white-space: pre-wrap;
+  font-size: inherit;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.markdown-content em {
+  font-style: italic;
+  color: #374151;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid #3b82f6;
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  background-color: #f8fafc;
+  color: #64748b;
+  border-radius: 0 8px 8px 0;
+}
+
+.markdown-content hr {
+  border: none;
+  height: 2px;
+  background-color: #e5e7eb;
+  margin: 2em 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  font-size: 0.9em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #e5e7eb;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.markdown-content blockquote p {
+  margin: 0;
+}
