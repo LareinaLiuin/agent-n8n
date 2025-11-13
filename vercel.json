@@ -19,8 +19,11 @@
       "dest": "/api/index.ts"
     },
     {
-      "src": "/(.*)",
+      "src": "(.*)",
       "dest": "/frontend/$1"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
