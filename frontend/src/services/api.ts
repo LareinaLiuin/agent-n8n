@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ChatMessage, SOP, ApiResponse } from '../types';
+import type { ChatMessage, ApiResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
