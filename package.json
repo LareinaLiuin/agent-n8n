@@ -1,0 +1,16 @@
+{
+  "name": "n8n-agent-assistant",
+  "version": "1.0.0",
+  "description": "n8n智能体助手 - 基于AI对话的n8n工作流构建工具",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run preview"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}
