@@ -19,7 +19,7 @@
       "dest": "/api/index.ts"
     },
     {
-      "src": "/(.*)",
+      "src": "(.*)",
       "dest": "/frontend/$1"
     }
   ],
