@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, RotateCcw } from 'lucide-react';
+import { Send, Bot, Loader2, RotateCcw } from 'lucide-react';
 import { useChat } from '../hooks/useChat';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import type { ChatMessage } from '../types';

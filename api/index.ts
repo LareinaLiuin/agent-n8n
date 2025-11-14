@@ -1,78 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { chatRoutes } from '../backend/src/routes/chat';
-import { sopRoutes } from '../backend/src/routes/sop';
-import { codeRoutes } from '../backend/src/routes/code';
-import { validationRoutes } from '../backend/src/routes/validation';
-import { OpenAIServiceManager } from '../backend/src/services/openai.service.manager';
 
-// 加载环境变量
-dotenv.config();
-
-// 初始化OpenAI服务管理器
-const openAIManager = OpenAIServiceManager.getInstance();
-if (openAIManager.isConfigured()) {
-  openAIManager.initialize();
-}
-
-// 创建Express应用
-const app = express();
-
-// 中间件配置
-app.use(cors({
-  origin: true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-// 健康检查端点
-app.get('/health', (req, res) => {
-  const openaiConfig = openAIManager.getConfig();
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    app: process.env.APP_NAME || 'n8n Agent Assistant',
-    version: process.env.APP_VERSION || '1.0.0',
-    openai: {
-      configured: openAIManager.isConfigured(),
-      baseURL: openaiConfig?.baseURL || null,
-      hasApiKey: !!openaiConfig?.apiKey
-    }
-  });
-});
-
-// API路由
-app.use('/chat', chatRoutes);
-app.use('/sop', sopRoutes);
-app.use('/code', codeRoutes);
-app.use('/validation', validationRoutes);
-
-// 404处理
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'API endpoint not found'
-  });
-});
-
-// 全局错误处理
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-
-  res.status(err.status || 500).json({
-    success: false,
-    error: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
-
-// Vercel Serverless Function
+// 简化的健康检查端点
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 设置CORS头
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -84,13 +12,91 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  // 简单的路由处理
+  const { url } = req;
+
   try {
-    await app(req, res);
-  } catch (error) {
-    console.error('Handler error:', error);
+    if (url === '/health' || url === '/api/health') {
+      res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        app: 'n8n Agent Assistant',
+        version: '1.0.0',
+        message: 'API is running'
+      });
+      return;
+    }
+
+    // 聊天端点 - 简化版本
+    if (url?.includes('/chat/session') && req.method === 'POST') {
+      res.json({
+        success: true,
+        data: {
+          sessionId: 'demo-session-' + Date.now(),
+          session: { id: 'demo-session-' + Date.now() }
+        }
+      });
+      return;
+    }
+
+    // 消息端点 - 简化版本
+    if (url?.includes('/chat/message') && req.method === 'POST') {
+      const { message } = req.body;
+
+      // 模拟AI响应
+      const aiResponse = `这是一个演示回复。您说：${message}
+
+在n8n中，您可以通过以下步骤实现自动化工作流：
+
+## 📋 基本步骤
+
+1. **创建触发器**
+   - Webhook触发器
+   - 定时触发器
+   - 手动触发器
+
+2. **添加处理节点**
+   - 数据处理
+   - 条件判断
+   - 格式转换
+
+3. **设置输出**
+   - 发送通知
+   - 保存数据
+   - 调用其他API
+
+## 🚀 开始使用
+
+建议您先在n8n中创建一个简单的工作流来熟悉界面和基本操作。`;
+
+      res.json({
+        success: true,
+        data: {
+          message: {
+            id: 'msg-' + Date.now(),
+            role: 'assistant',
+            content: aiResponse,
+            timestamp: new Date()
+          },
+          sessionId: 'demo-session-' + Date.now()
+        }
+      });
+      return;
+    }
+
+    // 404处理
+    res.status(404).json({
+      success: false,
+      error: 'API endpoint not found',
+      message: `路径 ${url} 不存在`
+    });
+
+  } catch (error: any) {
+    console.error('API Error:', error);
     res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Internal server error',
+      message: error.message || '服务器内部错误'
     });
   }
 }

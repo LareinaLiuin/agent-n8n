@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { ChatMessage } from '../types';
 import { chatApi } from '../services/api';
 

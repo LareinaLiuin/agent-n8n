@@ -80,7 +80,7 @@ n8n常用节点类型：
         contextInfo += `\n\n当前SOP信息：\n标题：${context.currentSOP.title}\n描述：${context.currentSOP.description}\n目标：${context.currentSOP.goal}\n步骤数：${context.currentSOP.steps.length}`;
       }
       if (context?.stepId) {
-        const step = context.currentSOP?.steps.find((s: SOPStep) => s.id === context.stepId);
+        const step = context.currentSOP?.steps.find(s => s.id === context.stepId);
         if (step) {
           contextInfo += `\n\n当前步骤：\n${step.title}\n${step.description}`;
         }

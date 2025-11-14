@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { ChatMessage, SOP, ApiResponse } from '../types';
+import type { ChatMessage, ApiResponse } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
 // 简化的API客户端
 const apiClient = axios.create({

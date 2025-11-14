@@ -1,93 +1,118 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { chatRoutes } from './routes/chat';
-import { sopRoutes } from './routes/sop';
-import { codeRoutes } from './routes/code';
-import { validateRoutes } from './routes/validation';
-import { OpenAIServiceManager } from './services/openai.service.manager';
+import { OpenAIService } from './services/openai.service';
+import { ChatMessage } from './types';
 
 // 加载环境变量
-console.log('🔍 Loading environment variables...');
-const result = dotenv.config();
-if (result.error) {
-  console.error('❌ Error loading .env file:', result.error);
-} else {
-  console.log('✅ Environment variables loaded successfully');
-  console.log('🔍 OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? `${process.env.OPENAI_API_KEY.substring(0, 10)}...` : 'undefined');
-  console.log('🔍 OPENAI_BASE_URL:', process.env.OPENAI_BASE_URL);
-}
-
-// 初始化OpenAI服务管理器
-console.log('🔍 Initializing OpenAI Service Manager...');
-const openAIManager = OpenAIServiceManager.getInstance();
-if (openAIManager.isConfigured()) {
-  openAIManager.initialize();
-  console.log('✅ OpenAI Service Manager initialized successfully');
-} else {
-  console.warn('⚠️ OpenAI Service Manager not configured - AI features will be disabled');
-}
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
-// 中间件配置
+// 中间件
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173'], // 支持Vite默认端口
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 请求日志中间件
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
-
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// 健康检查端点
+// 健康检查
 app.get('/health', (req, res) => {
-  const openaiConfig = openAIManager.getConfig();
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    app: process.env.APP_NAME || 'n8n Agent Assistant',
-    version: process.env.APP_VERSION || '1.0.0',
-    openai: {
-      configured: openAIManager.isConfigured(),
-      baseURL: openaiConfig?.baseURL || null,
-      hasApiKey: !!openaiConfig?.apiKey
+    app: 'n8n Agent Assistant',
+    version: '1.0.0',
+    message: 'Backend is running'
+  });
+});
+
+// 根路径
+app.get('/', (req, res) => {
+  res.json({
+    message: 'n8n Agent Assistant Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      session: '/api/chat/session',
+      message: '/api/chat/message'
     }
   });
 });
 
-// API路由
-app.use('/api/chat', chatRoutes);
-app.use('/api/sop', sopRoutes);
-app.use('/api/code', codeRoutes);
-app.use('/api/validation', validateRoutes);
+// 聊天会话创建
+app.post('/api/chat/session', (req, res) => {
+  const sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
 
-// 404处理
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'API endpoint not found'
+  console.log('Creating session:', sessionId);
+
+  res.json({
+    success: true,
+    data: {
+      sessionId: sessionId,
+      session: {
+        id: sessionId,
+        createdAt: new Date().toISOString()
+      }
+    }
   });
 });
 
-// 全局错误处理
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
+// 聊天消息处理
+app.post('/api/chat/message', async (req, res) => {
+  try {
+    console.log('Received message request:', req.body);
 
-  res.status(err.status || 500).json({
-    success: false,
-    error: err.message || 'Internal server error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message is required'
+      });
+    }
+
+    console.log('Processing message:', message);
+
+    // 初始化OpenAI服务
+    const openAIService = new OpenAIService();
+
+    // 生成AI回复
+    const messages: ChatMessage[] = [
+      { role: 'user', content: message }
+    ];
+    const aiResponse = await openAIService.sendMessage(messages);
+
+    const response = {
+      success: true,
+      data: {
+        message: {
+          id: 'msg-' + Date.now(),
+          role: 'assistant',
+          content: aiResponse,
+          timestamp: new Date().toISOString()
+        }
+      }
+    };
+
+    console.log('Sending response:', JSON.stringify(response, null, 2));
+    res.json(response);
+
+  } catch (error: any) {
+    console.error('Error processing message:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
 });
+
 
 // 启动服务器
 app.listen(PORT, () => {
@@ -95,7 +120,12 @@ app.listen(PORT, () => {
 🚀 n8n Agent Assistant Backend Server is running!
 📍 Port: ${PORT}
 🌍 Environment: ${process.env.NODE_ENV || 'development'}
-⏰ Started at: ${new Date().toLocaleString()}
-🔗 OpenAI Base URL: ${process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1'}
+⏰ Started at: ${new Date().toLocaleString('zh-CN')}
+
+📚 Available endpoints:
+  - GET  /health
+  - POST /api/chat/session
+  - POST /api/chat/message
+  - GET  /
   `);
 });

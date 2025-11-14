@@ -8,9 +8,9 @@ interface MarkdownRendererProps {
 // 简单的Markdown渲染器
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
   // 简单的Markdown解析和渲染
-  const renderMarkdown = (text: string): JSX.Element[] => {
+  const renderMarkdown = (text: string): React.ReactElement[] => {
     const lines = text.split('\n');
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactElement[] = [];
     let currentListItems: string[] = [];
     let inList = false;
     let inCodeBlock = false;
